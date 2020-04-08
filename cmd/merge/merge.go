@@ -2,6 +2,7 @@ package merge
 
 import (
 	"flag"
+	"strings"
 	"time"
 
 	"github.com/damirm/nurse-schedule/internal/command/merge"
@@ -13,7 +14,10 @@ func NewCommand() *Command {
 }
 
 type Config struct {
-	employee string
+	paths     string
+	employees string
+	out       string
+	dates     string
 }
 
 var config = Config{}
@@ -26,19 +30,32 @@ func (f *Command) Name() string {
 }
 
 func (f *Command) ExportFlags(flagSet *flag.FlagSet) error {
+	flagSet.StringVar(&config.paths, "paths", "", "list of file paths: ./path/to/a.csv,./path/to/b.csv")
+	flagSet.StringVar(&config.employees, "employees", "", "list of employees names: a, b")
+	flagSet.StringVar(&config.dates, "dates", "", "01/01/2020,01/02/2020")
+	flagSet.StringVar(&config.out, "out", "", "out file path")
 	return nil
 }
 
-func (f *Command) Run() error {
-	dateFrom, _ := time.Parse(schedule.TimeFormat, "11/03/2020")
-	dateTo, _ := time.Parse(schedule.TimeFormat, "11/04/2020")
+func (f *Command) Run(args []string) error {
+	dates := strings.Split(config.dates, ",")
+
+	dateFrom, err := time.Parse(schedule.TimeFormat, dates[0])
+	if err != nil {
+		return err
+	}
+
+	dateTo, err := time.Parse(schedule.TimeFormat, dates[1])
+	if err != nil {
+		return nil
+	}
 
 	config := merge.Config{
 		DateFrom:  dateFrom,
 		DateTo:    dateTo,
-		Paths:     []string{"./test/yc_lb.csv", "./test/yc_network.csv"},
-		Employees: []string{"staff:yesworld", "staff:flatline", "staff:raorn", "staff:ovov", "staff:tolmalev", "staff:lavrukov", "staff:wronglink"},
-		Out:       "./out/merged.csv",
+		Paths:     strings.Split(config.paths, ","),
+		Employees: strings.Split(config.employees, ","),
+		Out:       config.out,
 	}
 
 	return merge.Merge(config)

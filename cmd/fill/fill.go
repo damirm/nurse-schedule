@@ -1,8 +1,6 @@
 package fill
 
-import (
-	"flag"
-)
+import "flag"
 
 func NewCommand() *Command {
 	return &Command{}
@@ -21,10 +19,10 @@ func (f *Command) Name() string {
 	return "fill"
 }
 
-func (f *Command) ExportFlags(flagSet *flag.FlagSet) error {
+func (f *Command) ExportFlags(*flag.FlagSet) error {
 	return nil
 }
 
-func (f *Command) Run() error {
+func (f *Command) Run(args []string) error {
 	return nil
 }

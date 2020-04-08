@@ -14,7 +14,12 @@ import (
 type Command interface {
 	Name() string
 	ExportFlags(*flag.FlagSet) error
-	Run() error
+	Run(args []string) error
+}
+
+var subcommands = []Command{
+	fill.NewCommand(),
+	merge.NewCommand(),
 }
 
 func root() error {
@@ -22,18 +27,19 @@ func root() error {
 		return fmt.Errorf("Unknown subcommand")
 	}
 
-	subcommands := []Command{
-		fill.NewCommand(),
-		merge.NewCommand(),
-	}
-
 	subcommand := os.Args[1]
 
 	for _, cmd := range subcommands {
 		if subcommand == cmd.Name() {
-			flagSet := flag.NewFlagSet(cmd.Name(), flag.ExitOnError)
-			cmd.ExportFlags(flagSet)
-			return cmd.Run()
+			subset := flag.NewFlagSet(cmd.Name(), flag.PanicOnError)
+			cmd.ExportFlags(subset)
+
+			if err := subset.Parse(os.Args[2:]); err != nil {
+				flag.PrintDefaults()
+				return err
+			}
+
+			return cmd.Run(os.Args[2:])
 		}
 	}
 
