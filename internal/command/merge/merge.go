@@ -33,6 +33,8 @@ func Merge(config Config) error {
 		return err
 	}
 
+	var stat schedule.MergeStat
+
 	for i := 1; i < len(scheds); i += 1 {
 		second, err := schedule.CreateScheduleFromCSVFile(config.Paths[i])
 		if err != nil {
@@ -47,7 +49,9 @@ func Merge(config Config) error {
 			Second:    second,
 		}
 
-		merged, _ = schedule.Merge(spec)
+		merged, stat = schedule.Merge(spec)
+
+		fmt.Println(stat)
 	}
 
 	if config.Out == "" {

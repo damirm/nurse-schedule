@@ -28,6 +28,14 @@ func (d *Duty) IsBackup(e Employee) bool {
 	return d.Backup.Equals(e)
 }
 
+func (d *Duty) HasPrimary() bool {
+	return d.Primary.Name != ""
+}
+
+func (d *Duty) HasBackup() bool {
+	return d.Backup.Name != ""
+}
+
 type Schedule map[time.Time]Duty
 
 func (s Schedule) Equals(other Schedule) bool {
