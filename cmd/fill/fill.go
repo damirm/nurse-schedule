@@ -7,7 +7,8 @@ func NewCommand() *Command {
 }
 
 type Config struct {
-	employee string
+	employees string
+	dates     string
 }
 
 var config = Config{}
@@ -19,7 +20,9 @@ func (f *Command) Name() string {
 	return "fill"
 }
 
-func (f *Command) ExportFlags(*flag.FlagSet) error {
+func (f *Command) ExportFlags(subset *flag.FlagSet) error {
+	subset.StringVar(&config.employees, "employees", "", "comma-separateed list of employees names")
+	subset.StringVar(&config.dates, "dates", "", "comma-separateed list of start and end dates")
 	return nil
 }
 

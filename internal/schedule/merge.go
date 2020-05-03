@@ -28,21 +28,21 @@ func (ec employeeCache) hasEmployee(e Employee) bool {
 }
 
 type MergeStat struct {
-	Overlaps map[time.Time][]Duty
+	Conflicts map[time.Time][]Duty
 }
 
-func (s *MergeStat) AddOverlap(t time.Time, duties []Duty) {
-	if s.Overlaps == nil {
-		s.Overlaps = make(map[time.Time][]Duty)
+func (s *MergeStat) AddConflict(t time.Time, duties []Duty) {
+	if s.Conflicts == nil {
+		s.Conflicts = make(map[time.Time][]Duty)
 	}
 
-	arr, has := s.Overlaps[t]
+	arr, has := s.Conflicts[t]
 	if !has {
 		arr = []Duty{}
 	}
 
 	arr = append(arr, duties...)
-	s.Overlaps[t] = arr
+	s.Conflicts[t] = arr
 }
 
 type Merger struct {
@@ -91,7 +91,7 @@ func (m *Merger) Merge() Schedule {
 		if sok {
 			if m.cache.hasEmployee(sd.Primary) {
 				if duty.HasPrimary() {
-					m.Stat.AddOverlap(date, []Duty{duty, sd})
+					m.Stat.AddConflict(date, []Duty{duty, sd})
 				}
 
 				duty.Primary = sd.Primary
@@ -99,7 +99,7 @@ func (m *Merger) Merge() Schedule {
 
 			if m.cache.hasEmployee(sd.Backup) {
 				if duty.HasBackup() {
-					m.Stat.AddOverlap(date, []Duty{duty, sd})
+					m.Stat.AddConflict(date, []Duty{duty, sd})
 				}
 
 				duty.Backup = sd.Backup
